@@ -70,6 +70,7 @@ export type Keyword =
     | 'Ward'
     | 'Charge'
     | 'Rally'
+    | 'Mobilize'
 export type Attribute =
     | 'Strength'
     | 'Intelligence'
@@ -98,6 +99,7 @@ export type Race =
     | 'Dreugh'
     | 'Ash Creature'
     | 'Kwama'
+    | 'Spriggan'
     | 'Defense'
 export type Undead = 'Skeleton' | 'Vampire' | 'Mummy' | 'Spirit'
 export type Animal =
