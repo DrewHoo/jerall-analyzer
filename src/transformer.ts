@@ -26,6 +26,12 @@ type MarioCard = {
     text: string
 }
 
+function main() {
+    makeCardArray()
+}
+
+main()
+
 function fixText(text: string) {
     return text.split(/[\n\r]/g).filter(str => str.length)
 }
@@ -71,76 +77,106 @@ function makeGenderFile() {
 }
 
 function getGenderMap(): Map<string, Gender> {
-    const rawData: Buffer = fs.readFileSync('./cards/genders.json')
-    const data: { name: string; gender: Gender }[] = JSON.parse(
+    const rawData: Buffer = fs.readFileSync('src/cards/genders.json')
+    const data: { name: string; gender: string }[] = JSON.parse(
         rawData.toString()
     )
-    const arr: [string, Gender][] = []
-    data.forEach(({ name, gender }) => arr.push([name, _getGender(gender)]))
+    const arr: [string, Gender][] = data.map(
+        ({ name, gender }): [string, Gender] => [name, _getGender(gender)]
+    )
     return new Map(arr)
 }
 
-function makeCardArray(): Card[] {
+function makeCardArray(): void {
     const cards: MarioCard[] = getMariosCards()
+    const levelledCards = [
+        "Alik'r Bandit",
+        'Archein Guerrilla',
+        'Camlorn Adventurer',
+        'Deshaan Sneak',
+        'Dres Guard',
+        'Dune Rogue',
+        'Expert Atromancer',
+        "Fate's Witness",
+        'Guild Recruit',
+        'Hive Worker',
+        'Initiate of Hircine',
+        'Northpoint Lieutenant',
+        'Night Patrol',
+        "Quin'rawl Skulker",
+        'Rihad Nomad',
+        'Rising Legate',
+        'Student of Arms',
+        'Valenwood Trapper',
+        'Volkihar Lord',
+        'Whiterun Recruit',
+    ]
     const genderMap: Map<string, Gender> = getGenderMap()
-    return cards.map(card => {
-        const {
-            id,
-            isunique,
-            attack,
-            health,
-            race,
-            text,
-            rarity,
-            type,
-            set,
-            attributes,
-            keywords,
-            name,
-            cost,
-        } = card
-        const baseCard = {
-            name,
-            cost,
-            collectible: true,
-            rarity: getRarity(rarity, isunique),
-            set: getSet(set),
-            attributes: getAttributes(attributes),
-            keywords: getKeywords(keywords),
-        }
-        switch (type) {
-            case 'Creature':
-                return {
-                    ...baseCard,
-                    type,
-                    gender: getGender(name, genderMap),
-                    race: [getRace(race)],
-                    power: attack,
-                    health,
-                    ...(text ? { text: fixText(text) } : {}),
-                }
-            case 'Action':
-                return {
-                    ...baseCard,
-                    type,
-                    text: fixText(text),
-                }
-            case 'Item':
-                return {
-                    ...baseCard,
-                    type,
-                    text: fixText(text),
-                }
-            case 'Support':
-                return {
-                    ...baseCard,
-                    type,
-                    text: fixText(text),
-                }
-            default:
-                throw new Error(`invalid Card type: '${type}'`)
-        }
-    })
+    const tsCards: Card[] = cards
+        .filter(({ name }) => !levelledCards.includes(name))
+        .filter(({ type }) => type !== 'Double')
+        .map(card => {
+            const {
+                id,
+                isunique,
+                attack,
+                health,
+                race,
+                text,
+                rarity,
+                type,
+                set,
+                attributes,
+                keywords,
+                name,
+                cost,
+            } = card
+            const baseCard = {
+                name,
+                cost,
+                collectible: true,
+                rarity: getRarity(rarity, isunique),
+                set: getSet(set),
+                attributes: getAttributes(attributes),
+                keywords: getKeywords(keywords),
+            }
+            switch (type) {
+                case 'Creature':
+                    return {
+                        ...baseCard,
+                        type,
+                        gender: getGender(name, genderMap),
+                        race: [getRace(race)],
+                        power: attack,
+                        health,
+                        ...(text ? { text: fixText(text) } : {}),
+                    }
+                case 'Action':
+                    return {
+                        ...baseCard,
+                        type,
+                        text: fixText(text),
+                    }
+                case 'Item':
+                    return {
+                        ...baseCard,
+                        type,
+                        text: fixText(text),
+                    }
+                case 'Support':
+                    return {
+                        ...baseCard,
+                        type,
+                        text: fixText(text),
+                    }
+                default:
+                    throw new Error(`invalid Card type: '${type}'`)
+            }
+        })
+    fs.writeFileSync(
+        'src/cards/cards.ts',
+        `import { Card } from '../types'\nexport const cards: Card[] = ${JSON.stringify(tsCards)}`
+    )
 }
 
 function getGender(name: string, genderMap: Map<string, Gender>): Gender {
@@ -156,7 +192,7 @@ function _getGender(gender: string): Gender {
     if (genders.includes(gender as Gender)) {
         return gender as Gender
     }
-    throw new Error(`Invalid gender '${gender}' for ${name}`)
+    throw new Error(`Invalid gender '${gender}'`)
 }
 
 function getKeywords(keywords: string[]): Keyword[] {
@@ -194,34 +230,68 @@ function getRace(race: string): Race {
             return 'Argonian'
         case 'Ash Creature':
             return 'Ash Creature'
+        case 'Automaton':
+            return 'Automaton'
         case 'Beast':
             return 'Beast'
         case 'Breton':
             return 'Breton'
+        case 'Centaur':
+            return 'Centaur'
+        case 'Chaurus':
+            return 'Chaurus'
         case 'Daedra':
             return 'Daedra'
         case 'Dark Elf':
             return 'Dark Elf'
         case 'Defense':
             return 'Defense'
+        case 'Dragon':
+            return 'Dragon'
         case 'Dreugh':
             return 'Dreugh'
         case 'Dwemer':
             return 'Dwemer'
+        case 'Elytra':
+            return 'Elytra'
+        case 'Falmer':
+            return 'Falmer'
+        case 'Fabricant':
+            return 'Fabricant'
+        case 'Factotum':
+            return 'Factotum'
         case 'Fish':
             return 'Fish'
+        case 'Giant':
+            return 'Giant'
+        case 'Goblin':
+            return 'Goblin'
         case 'God':
             return 'God'
+        case 'Grummite':
+            return 'Grummite'
+        case 'Harpy':
+            return 'Harpy'
         case 'High Elf':
             return 'High Elf'
         case 'Imperial':
             return 'Imperial'
+        case 'Imp':
+            return 'Imp'
+        case 'Lurcher':
+            return 'Lurcher'
         case 'Khajiit':
             return 'Khajiit'
         case 'Kwama':
             return 'Kwama'
+        case 'Nereid':
+            return 'Nereid'
         case 'Mammoth':
             return 'Mammoth'
+        case 'Mantikora':
+            return 'Mantikora'
+        case 'Minotaur':
+            return 'Minotaur'
         case 'Mudcrab':
             return 'Mudcrab'
         case 'Mummy':
@@ -232,6 +302,10 @@ function getRace(race: string): Race {
             return 'Nord'
         case 'Orc':
             return 'Orc'
+        case 'Ogre':
+            return 'Ogre'
+        case 'Reachman':
+            return 'Reachman'
         case 'Redguard':
             return 'Redguard'
         case 'Reptile':
@@ -246,16 +320,22 @@ function getRace(race: string): Race {
             return 'Spirit'
         case 'Spriggan':
             return 'Spriggan'
+        case 'Troll':
+            return 'Troll'
         case 'Vampire':
             return 'Vampire'
+        case 'Wamasu':
+            return 'Wamasu'
         case 'Werewolf':
             return 'Werewolf'
         case 'Wolf':
             return 'Wolf'
         case 'Wood Elf':
             return 'Wood Elf'
+        case 'Wraith':
+            return 'Wraith'
         default:
-            throw new Error(`Invalid race: ${race}`)
+            throw new Error(`Invalid Race: ${race}`)
     }
 }
 
@@ -281,27 +361,31 @@ function getAttributes(attributes: string[]): Attribute[] {
 }
 
 function getSet(set: string): Set {
-    switch (set) {
-        case 'Houses of Morrowind':
+    switch (set.toLowerCase()) {
+        case 'houses of morrowind':
             return 'Houses of Morrowind'
-        case 'Alliance War':
+        case 'alliance war':
             return 'Alliance War'
-        case 'Clockwork City':
+        case 'clockwork city':
             return 'Clockwork City'
-        case 'Core':
+        case 'core':
             return 'Core'
-        case 'Dark Brotherhood':
+        case 'dark brotherhood':
             return 'Dark Brotherhood'
-        case 'Forgotten Hero':
+        case 'forgotten hero':
             return 'Forgotten Hero'
-        case 'Frostfall':
+        case 'frostfall':
             return 'Frostfall'
-        case 'Heroes of Skyrim':
+        case 'heroes of skyrim':
             return 'Heroes of Skyrim'
-        case 'Isle of Madness':
+        case 'isle of madness':
             return 'Isle of Madness'
-        case 'Madhouse Collection':
+        case 'madhouse collection':
             return 'Madhouse Collection'
+        case 'monthlies':
+            return 'Monthly Reward'
+        case 'festival of madness':
+            return 'Festival of Madness'
         default:
             throw new Error(`Invalid set: ${set}`)
     }
@@ -332,6 +416,8 @@ function getCardType(input: string): CardType {
             return 'Item'
         case 'Support':
             return 'Support'
+        case 'Double':
+            return 'Double'
         default:
             throw new Error(`Invalid CardType: ${input}`)
     }

@@ -387,7 +387,7 @@
     "gender": "Male"
 }, {
     "name": "Child of Hircine",
-    "gender": "Unknown"
+    "gender": "Female"
 }, {
     "name": "Cicero the Betrayer",
     "gender": "Male"
@@ -510,7 +510,7 @@
     "gender": "Unknown"
 }, {
     "name": "Dark Guardian",
-    "gender": ""
+    "gender": "Unknown"
 }, {
     "name": "Dark Harvester",
     "gender": "Unknown"
@@ -1884,7 +1884,7 @@
     "gender": "Unknown"
 }, {
     "name": "Stronghold Patrol",
-    "gender": ""
+    "gender": "Male"
 }, {
     "name": "Stronghold Prototype",
     "gender": "Unknown"
